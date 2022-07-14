@@ -9,6 +9,7 @@ import argparse
 import enum
 import json
 import logging
+import sys
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -114,6 +115,9 @@ def main():
     args = parser.parse_args()
 
     logging.basicConfig(level=args.log.upper())
+    wsgi_log = None
+    if args.log.upper() == 'DEBUG':
+        wsgi_log = sys.stderr
 
     global TOPIC_PREFIX
     TOPIC_PREFIX = args.prefix
@@ -127,5 +131,5 @@ def main():
     global MQTT
     MQTT = client
 
-    server = WSGIServer(("", args.port), app)
+    server = WSGIServer(("", args.port), app, log=wsgi_log)
     server.serve_forever()
